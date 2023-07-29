@@ -14,7 +14,6 @@ Prerequisites:
 Install dependencies
 ```
 npm i
-
 ```
 
 Start up development mode
