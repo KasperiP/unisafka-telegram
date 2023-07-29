@@ -26,7 +26,7 @@ bot.onText(/\/ruokalista/, async (msg, match) => {
 	if (!campus && !campuses?.includes(campus)) {
 		bot.sendMessage(
 			msg.chat.id,
-			'Valitse haluamasi kampus komennolla. Voit myös valita haluamasi päivän: /ruokalista tay ti',
+			`Valitse haluamasi kampus komennolla. Voit myös valita haluamasi päivän: /ruokalista tay ${day}`,
 			{
 				reply_markup: {
 					keyboard: [
