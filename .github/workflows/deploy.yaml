@@ -1,0 +1,32 @@
+name: CI
+
+on:
+    push:
+        branches: ['master']
+
+jobs:
+    deploy:
+        name: Deploy to VPS
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: executing remote ssh commands using password
+              uses: appleboy/ssh-action@v0.1.10
+              with:
+                  host: ${{ secrets.SSH_IP }}
+                  username: ${{ secrets.SSH_USERNAME }}
+                  password: ${{ secrets.SSH_PASSWORD }}
+                  port: ${{ secrets.SSH_PORT }}
+                  script: |
+                      cd unisafka-telegram
+                      rm -rf unisafka-telegram
+                      git clone git@github.com:KasperiP/unisafka-telegram.git
+                      cp .env unisafka-telegram/.env
+                      cd unisafka-telegram
+                      docker build -t unisafka-telegram .
+                      docker stop unisafka-telegram
+                      docker rm unisafka-telegram
+                      docker run -d --restart=always --name unisafka-telegram unisafka-telegram
