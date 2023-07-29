@@ -26,7 +26,7 @@ jobs:
                       git clone git@github.com:KasperiP/unisafka-telegram.git
                       cp .env unisafka-telegram/.env
                       cd unisafka-telegram
-                      docker build -t unisafka-telegram .
                       docker stop unisafka-telegram
                       docker rm unisafka-telegram
+                      docker build -t unisafka-telegram .
                       docker run -d --restart=always --name unisafka-telegram unisafka-telegram
