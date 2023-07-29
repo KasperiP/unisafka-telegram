@@ -3,7 +3,6 @@ require('dotenv').config();
 const { fetchMenu } = require('./functions/fetchMenu');
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
-
 const weekDays = [
 	'Sunnuntai',
 	'Maanantai',
@@ -15,115 +14,63 @@ const weekDays = [
 ];
 const weekDaysShort = ['su', 'ma', 'ti', 'ke', 'to', 'pe', 'la'];
 const campuses = ['tty', 'tay', 'tays', 'tamk'];
-
 const bot = new TelegramBot(token, { polling: true });
 
 bot.onText(/\/ruokalista/, async (msg, match) => {
-	const campus = match.input.split(' ')?.[1];
-	const day =
-		match.input.split(' ')?.[2] ?? weekDaysShort[new Date().getDay()];
+	const [_, campus, day = weekDaysShort[new Date().getDay()]] =
+		match.input.split(' ');
 
-	if (day && !weekDaysShort.includes(day)) {
+	if (!campus || !campuses.includes(campus) || !weekDaysShort.includes(day)) {
 		return bot.sendMessage(
 			msg.chat.id,
 			`Valitse haluamasi kampus komennolla. Voit myös valita haluamasi päivän: /ruokalista tay ma`,
 			{
 				reply_markup: {
-					keyboard: [
-						['/ruokalista tty'],
-						['/ruokalista tay'],
-						['/ruokalista tays'],
-						['/ruokalista tamk'],
-					],
-				},
-			}
-		);
-	}
-
-	if (!campus || !campuses?.includes(campus)) {
-		return bot.sendMessage(
-			msg.chat.id,
-			`Valitse haluamasi kampus komennolla. Voit myös valita haluamasi päivän: /ruokalista tay ${day}`,
-			{
-				reply_markup: {
-					keyboard: [
-						['/ruokalista tty'],
-						['/ruokalista tay'],
-						['/ruokalista tays'],
-						['/ruokalista tamk'],
-					],
+					keyboard: campuses.map((campus) => [
+						`/ruokalista ${campus}`,
+					]),
 				},
 			}
 		);
 	}
 
 	const menu = await fetchMenu(day);
-
 	const wantedRestaurants = menu?.restaurants?.[campus];
 	const availableMeals = menu?.[`restaurants_${campus}`];
 
 	if (!wantedRestaurants || !availableMeals) return;
 
-	const outputs = new Object();
+	const outputs = {};
 
 	wantedRestaurants.forEach((restaurant) => {
 		const resMenu = availableMeals?.[restaurant];
 		if (!resMenu) return;
-		outputs[resMenu.restaurant] = '';
-
-		if (resMenu.meals.length === 0) {
-			outputs[resMenu.restaurant] = 'Ravintola kiinni';
-		} else {
-			const mo = resMenu.meals.map((meal) => meal.mo);
-			mo.forEach((meal, index) => {
-				const foodObj = meal
-					.map((menuItem) => menuItem.mpn)
-					.map((food) => {
-						const allowedCharacters =
-							'abcdefghijklmnopqrstuvwxyzåäö';
-						const foodArr = food.split('');
-						const foodArrFiltered = foodArr.filter(
-							(char) =>
-								allowedCharacters.includes(
-									char.toLowerCase()
-								) || char === ' '
-						);
-						const foodFiltered = foodArrFiltered.join('');
-
-						return foodFiltered;
-					});
-				outputs[resMenu.restaurant] += `*${index + 1})* ${foodObj.join(
-					', '
-				)}\n`;
-			});
-		}
+		outputs[resMenu.restaurant] =
+			resMenu.meals.length === 0
+				? 'Ravintola kiinni'
+				: resMenu.meals
+						.map((meal, index) => {
+							const foodObj = meal.mo
+								.map((menuItem) =>
+									menuItem.mpn.replace(/[^a-zåäö\s]/gi, '')
+								)
+								.join(', ');
+							return `*${index + 1})* ${foodObj}\n`;
+						})
+						.join('');
 	});
 
-	let dateStr = '';
-	if (day) {
-		dateStr += `${weekDays[weekDaysShort.indexOf(day)]} ${
-			new Date().getDate() +
-			weekDaysShort.indexOf(day) -
-			new Date().getDay()
-		}.${new Date().getMonth() + 1}.`;
-	} else {
-		dateStr = `${weekDays[new Date().getDay()]} ${new Date().getDate()}.${
-			new Date().getMonth() + 1
-		}.`;
-	}
-
-	let mealsStr = '';
-	Object.entries(outputs).forEach(([res, list]) => {
-		mealsStr += `${res}\n${list}\n\n`;
-	});
+	const dateStr = `${weekDays[weekDaysShort.indexOf(day)]} ${
+		new Date().getDate() + weekDaysShort.indexOf(day) - new Date().getDay()
+	}.${new Date().getMonth() + 1}.`;
+	let mealsStr = Object.entries(outputs)
+		.map(([res, list]) => `${res}\n${list}\n\n`)
+		.join('');
 
 	mealsStr = mealsStr.replace(/\n{3,}/g, '\n\n');
 
 	mealsStr +=
-		`💡 _Voit myös hakea haluamasi päivän ruokalistat komennolla:` +
-		'_`' +
-		`/ruokalista ${campus} ma` +
-		'`';
+		`💡 _Voit myös hakea haluamasi päivän ruokalistat komennolla:_ \`/ruokalista ${campus} ma\``.toString();
 
 	bot.sendMessage(msg.chat.id, `*Ruokalistat ${dateStr}*\n\n${mealsStr}`, {
 		parse_mode: 'Markdown',
