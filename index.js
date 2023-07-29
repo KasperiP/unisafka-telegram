@@ -23,8 +23,25 @@ bot.onText(/\/ruokalista/, async (msg, match) => {
 	const day =
 		match.input.split(' ')?.[2] ?? weekDaysShort[new Date().getDay()];
 
-	if (!campus && !campuses?.includes(campus)) {
-		bot.sendMessage(
+	if (day && !weekDaysShort.includes(day)) {
+		return bot.sendMessage(
+			msg.chat.id,
+			`Valitse haluamasi kampus komennolla. Voit myös valita haluamasi päivän: /ruokalista tay ma`,
+			{
+				reply_markup: {
+					keyboard: [
+						['/ruokalista tty'],
+						['/ruokalista tay'],
+						['/ruokalista tays'],
+						['/ruokalista tamk'],
+					],
+				},
+			}
+		);
+	}
+
+	if (!campus || !campuses?.includes(campus)) {
+		return bot.sendMessage(
 			msg.chat.id,
 			`Valitse haluamasi kampus komennolla. Voit myös valita haluamasi päivän: /ruokalista tay ${day}`,
 			{
