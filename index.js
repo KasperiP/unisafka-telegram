@@ -45,7 +45,7 @@ bot.onText(/\/ruokalista/, async (msg, match) => {
 	wantedRestaurants.forEach((restaurant) => {
 		const resMenu = availableMeals?.[restaurant];
 		if (!resMenu) return;
-		outputs[resMenu.restaurant] =
+		outputs[restaurant] =
 			resMenu.meals.length === 0
 				? 'Ravintola kiinni'
 				: resMenu.meals
@@ -55,7 +55,7 @@ bot.onText(/\/ruokalista/, async (msg, match) => {
 									menuItem.mpn.replace(/[^a-zåäö\s]/gi, '')
 								)
 								.join(', ');
-							return `*${index + 1})* ${foodObj}\n`;
+							return `*(${index + 1})* ${foodObj}\n`;
 						})
 						.join('');
 	});
@@ -63,8 +63,16 @@ bot.onText(/\/ruokalista/, async (msg, match) => {
 	const dateStr = `${weekDays[weekDaysShort.indexOf(day)]} ${
 		new Date().getDate() + weekDaysShort.indexOf(day) - new Date().getDay()
 	}.${new Date().getMonth() + 1}.`;
+
 	let mealsStr = Object.entries(outputs)
-		.map(([res, list]) => `${res}\n${list}\n\n`)
+		.map(
+			([res, list]) =>
+				`*${availableMeals[res].restaurant}*${
+					availableMeals[res].eating_hours !== ''
+						? ` *(${availableMeals[res].eating_hours})*`
+						: ''
+				}\n${list}\n\n`
+		)
 		.join('');
 
 	mealsStr = mealsStr.replace(/\n{3,}/g, '\n\n');
