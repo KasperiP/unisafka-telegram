@@ -23,7 +23,7 @@ jobs:
                   script: |
                       cd unisafka-telegram
                       rm -rf unisafka-telegram
-                      git clone git@github.com:KasperiP/unisafka-telegram.git
+                      git clone https://github.com/KasperiP/unisafka-telegram.git
                       cp .env unisafka-telegram/.env
                       cd unisafka-telegram
                       docker stop unisafka-telegram
