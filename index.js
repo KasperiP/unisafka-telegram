@@ -101,3 +101,16 @@ bot.onText(/\/ruokalista/, async (msg, match) => {
 		parse_mode: 'Markdown',
 	});
 });
+
+bot.onText(/\/source/, (msg) => {
+	console.log(
+		`${new Date().toLocaleString()} - ${msg.from.username} - /source`
+	);
+	bot.sendMessage(
+		msg.chat.id,
+		'Tämä botti pohjautuu avoimeen lähdekoodiin. Voit tarkastella koodia *GitHubissa*, sekä ilmoittaa mahdollisista ongelmista GitHubin _issues_-välilehdellä:\n\nhttps://github.com/KasperiP/unisafka-telegram',
+		{
+			parse_mode: 'Markdown',
+		}
+	);
+});
