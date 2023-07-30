@@ -47,6 +47,9 @@ bot.onText(/\/ruokalista/, async (msg, match) => {
 		);
 	}
 
+	console.log(
+		`${new Date().toLocaleString()} - ${msg.from.username} - ${match.input}`
+	);
 
 	const menu = await fetchMenu(day);
 	const wantedRestaurants = menu?.restaurants?.[campus];
