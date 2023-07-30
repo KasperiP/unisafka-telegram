@@ -85,7 +85,8 @@ bot.onText(/\/ruokalista/, async (msg, match) => {
 		.map(
 			([res, list]) =>
 				`*${availableMeals[res].restaurant}*${
-					availableMeals[res].eating_hours !== ''
+					availableMeals[res].eating_hours !== '' &&
+					availableMeals[res].meals.length !== 0
 						? ` *(${availableMeals[res].eating_hours})*`
 						: ''
 				}\n${list}\n\n`
