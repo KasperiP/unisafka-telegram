@@ -1,6 +1,7 @@
 const TelegramBot = require('node-telegram-bot-api');
 require('dotenv').config();
 const { fetchMenu } = require('./functions/fetchMenu');
+const { getNextDateOfTheDay } = require('./functions/getNextDate');
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const weekDays = [
@@ -72,9 +73,9 @@ bot.onText(/\/ruokalista/, async (msg, match) => {
 						.join('');
 	});
 
-	const dateStr = `${weekDays[weekDaysShort.indexOf(day)]} ${
-		new Date().getDate() + weekDaysShort.indexOf(day) - new Date().getDay()
-	}.${new Date().getMonth() + 1}.`;
+	const dateStr = `${
+		weekDays[weekDaysShort.indexOf(day)]
+	} ${getNextDateOfTheDay(day)}.`;
 
 	let mealsStr = Object.entries(outputs)
 		.map(
