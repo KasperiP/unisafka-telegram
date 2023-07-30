@@ -21,18 +21,6 @@ bot.onText(/\/ruokalista/, async (msg, match) => {
 	const [_, campus, day = weekDaysShort[new Date().getDay()]] =
 		match.input.split(' ');
 
-	if (
-		weekDaysShort.indexOf(day) < new Date().getDay() &&
-		weekDaysShort.indexOf(day) !== 0
-	) {
-		return bot.sendMessage(
-			msg.chat.id,
-			`Päivä ${
-				weekDays[weekDaysShort.indexOf(day)]
-			} on jo mennyt, eikä seuraavan viikon ruokalistoja ole vielä saatavilla! 😢`
-		);
-	}
-
 	if (!campus || !campuses.includes(campus) || !weekDaysShort.includes(day)) {
 		return bot.sendMessage(
 			msg.chat.id,
@@ -46,6 +34,19 @@ bot.onText(/\/ruokalista/, async (msg, match) => {
 			}
 		);
 	}
+
+	if (
+		weekDaysShort.indexOf(day) < new Date().getDay() &&
+		weekDaysShort.indexOf(day) !== 0
+	) {
+		return bot.sendMessage(
+			msg.chat.id,
+			`Päivä ${
+				weekDays[weekDaysShort.indexOf(day)]
+			} on jo mennyt, eikä seuraavan viikon ruokalistoja ole vielä saatavilla! 😢`
+		);
+	}
+
 
 	const menu = await fetchMenu(day);
 	const wantedRestaurants = menu?.restaurants?.[campus];
