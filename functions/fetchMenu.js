@@ -14,13 +14,14 @@ const getWeekNumber = () => {
 	const days = Math.floor((date - startDate) / (24 * 60 * 60 * 1000));
 
 	const weekNumber = Math.ceil(days / 7);
-	return weekNumber + 1;
+
+	if (date.getDay() === 0) return weekNumber + 1;
+
+	return weekNumber;
 };
 
 const fetchVersion = async () => {
-	const url = `https://unisafka.fi/static/json/${getYear()}/${
-		getWeekNumber() - 1
-	}/v.json`;
+	const url = `https://unisafka.fi/static/json/${getYear()}/${getWeekNumber()}/v.json`;
 	try {
 		const { data } = await axios.get(url);
 		return data.v;
@@ -37,9 +38,9 @@ const fetchVersion = async () => {
 const fetchMenu = async (day) => {
 	const date = new Date();
 	const version = await fetchVersion();
-	const url = `https://unisafka.fi/static/json/${getYear()}/${
-		getWeekNumber() - 1
-	}/${version}/${day || weekDays[date.getDay()]}.json`;
+	const url = `https://unisafka.fi/static/json/${getYear()}/${getWeekNumber()}/${version}/${
+		day || weekDays[date.getDay()]
+	}.json`;
 
 	try {
 		const { data } = await axios.get(url);
