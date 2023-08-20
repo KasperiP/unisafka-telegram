@@ -52,10 +52,18 @@ bot.onText(/\/ruokalista/, async (msg, match) => {
 	);
 
 	const menu = await fetchMenu(day);
+
 	const wantedRestaurants = menu?.restaurants?.[campus];
 	const availableMeals = menu?.[`restaurants_${campus}`];
 
-	if (!wantedRestaurants || !availableMeals) return;
+	if (!wantedRestaurants || !availableMeals) {
+		return bot.sendMessage(
+			msg.chat.id,
+			`Ruokalistojen hakemisessa päivälle ${
+				weekDays[weekDaysShort.indexOf(day)]
+			} tapahtui virhe. Yritä myöhemmin uudelleen.`
+		);
+	}
 
 	const outputs = {};
 
