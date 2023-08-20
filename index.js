@@ -59,9 +59,9 @@ bot.onText(/\/ruokalista/, async (msg, match) => {
 	if (!wantedRestaurants || !availableMeals) {
 		return bot.sendMessage(
 			msg.chat.id,
-			`Ruokalistojen hakemisessa päivälle ${
-				weekDays[weekDaysShort.indexOf(day)]
-			} tapahtui virhe. Yritä myöhemmin uudelleen.`
+			`Ruokalistojen hakemisessa päivälle ${weekDays[
+				weekDaysShort.indexOf(day)
+			].toLowerCase()} tapahtui virhe. Yritä myöhemmin uudelleen.`
 		);
 	}
 
